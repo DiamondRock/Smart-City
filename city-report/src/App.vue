@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <photo-capture></photo-capture>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -8,6 +8,8 @@
 import ReportTypeSelection from '@/components/ReportTypeSelection.vue'
 import InformationGather from '@/components/InformationGather.vue'
 import PhotoCapture from '@/components/PhotoCapture.vue'
+import WelcomePage from '@/components/WelcomePage.vue'
+import TypeSelectModal from "@/components/TypeSelectModal.vue";
 
 export default {
   name: "app",
@@ -15,13 +17,15 @@ export default {
   components: {
     ReportTypeSelection,
     InformationGather,
-    PhotoCapture
+    PhotoCapture,
+    WelcomePage,
+    TypeSelectModal
   }
 };
 </script>
 
 <style>
-#app {
+* {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
