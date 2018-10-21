@@ -1,57 +1,114 @@
 <?php
-    $query = "INSERT INTO event (latitude, longitude, image, type, name, phoneNo, reportDateTime, eventDateTime, status, important, urgent) VALUES (:latitude, :longitude, :image, :type, :name, :phoneNo, reportDateTime, :eventDateTime, :status, :important, :urgent)";
-    $params = [2.2, 2.2, NULL, "1", "John", "9999999", "2018", "2018", "open", 0, 0];
-    require_once('connectDB.php');
-    executeQuery($conn, $query, $params);
     if ($_SERVER['REQUEST_METHOD'] == 'POST')
-    {
-        $latitude = test-input($_POST['latitude']);
-        $longitude = test-input($_POST['longitude']);
-        $image = test-input($_POST['image']);
-        $type = test-input($_POST['type']);
-        $name = test-input($_POST['name']);
-        $phoneNo = test-input($_POST['phoneNo']);
-        $eventDateTime = test-input($_POST['eventDateTime']);
-        $status = test-input($_POST['status']);
-        $important = test-input($_POST['important']);
-        $urgent = test-input($_POST['urgent']);
-        require_once('connectDB.php');
-
-        $reportDateTime = $_POST['reportDateTime'];
-
-        $query = "INSERT INTO event (latitude, longitude, image, type, name, phoneNo, reportDateTime, eventDateTime, status, important, urgent) VALUES (:latitude, :longitude, :image, :type, :name, :phoneNo, reportDateTime, :eventDateTime, :status, :important, :urgent)";
-        $params = [$latitude, $longitude, $image, $type, $name, $phoneNo, $eventDateTime, $status, $important, $urgent];
-        executeQuery($conn, $query, $params);
-        $conn->close();
-    }
-    function test_input($data)
-    {
-    	$data = trim($data);
-    	$data = stripslashes($data);
-    	$data = htmlspecialchars($data);
-    	return $data;
-    }
-    function executeQuery($conn, $query, $params)
     {
         try
         {
-            $stmt = $conn->prepare($query);
-            $regex = "/(\:[A-Za-z][A-Za-z0-9]*)(?:,|\))/";
-            preg_match_all($regex, $query, $matches, PREG_OFFSET_CAPTURE);
-            $matches = $matches[0];
-            $counter = 0;
-            foreach ($matches as $array)
+            $valid = checkIfDataIsValid();
+            if(!is_bool($valid))
             {
-                echo substr($array[0], 0, strlen($array[0]) - 1)."<br>";
-                $stmt->bindParam(substr($array[0], 0, strlen($array[0]) - 1), $params[$counter]);
-                $counter++;
+                throw new Exception($valid[1]);
             }
-            $stmt->execute();
-            $stmt->close();
+            $latitude = $_POST['latitude'];
+            $longitude = $_POST['longitude'];
+            $image = $_POST['image'];
+            $type = $_POST['type'];
+            $name = $_POST['name'];
+            $phoneNo = $_POST['phoneNo'];
+            $important = $_POST['important'];
+            $urgent = $_POST['urgent'];
+            $description = $_POST['description'];
+            [$latitude, $longitude, $image, $type, $name, $phoneNo, $important, $urgent, $description]
+            = test_input_all($latitude, $longitude, $image, $type, $name, $phoneNo, $important, $urgent, $description);
+            if(empty($important))
+            {
+                $important = 0;
+            }
+            if(empty($urgent))
+            {
+                $urgent = 0;
+            }
+
+            if(empty($image) && empty($description))
+            {
+                //throw new Exception("Either description or image should be present");
+            }
+
+            $reportDateTime = date("c");
+            $status = "pending";
+
+            require_once('connectDB.php');
+            $query = "INSERT INTO event (latitude, longitude, image, type, name, phoneNo,
+                reportDateTime, status, important, urgent, description) VALUES (:latitude, :longitude, :image, :type, :name,
+                :phoneNo, :reportDateTime, :status, :important, :urgent, :description)";
+            $params = [$latitude, $longitude, $image, $type, $name, $phoneNo,
+                $reportDateTime, $status, $important, $urgent, $description];
+            $stmt = executeQuery($conn, $query, $params);
+            if(!is_bool($stmt))
+            {
+                throw new Exception($stmt[1]);
+            }
+            $conn = null;
         }
-        catch(PDOException $e)
+        catch(Exception $e)
         {
             echo "Error: " . $e->getMessage();
         }
     }
+    function test_input($param)
+    {
+        if(is_null($param))
+        {
+            return $param;
+        }
+        $param = trim($param);
+        $param = stripslashes($param);
+        $param = htmlspecialchars($param);
+    	return $param;
+    }
+    function checkIfDataIsValid()
+    {
+        $valid = AnyPostParamIsNull();
+        if(!is_bool($valid))
+        {
+            return AnyPostParamIsNull();
+        }
+        return TRUE;
+    }
+    function AnyPostParamIsNull()
+    {
+        $postParamsNotNull = ['latitude', 'longitude', 'type'];
+        foreach($postParamsNotNull as $param)
+        {
+            if(!isset($_POST[$param]))
+            {
+                return [FALSE, "$param is empty"];
+            }
+        }
+        return True;
+    }
+    function test_input_all()
+    {
+        for ($i = 0; $i < func_num_args(); $i++)
+        {
+            $result[$i] = test_input(func_get_arg($i));
+        }
+        return $result;
+    }
+
+    function nullStringIfNull()
+    {
+        for ($i = 0; $i < func_num_args(); $i++)
+        {
+            if(func_get_arg($i) == '')
+            {
+                $result[$i] = "NULL";
+            }
+            else
+            {
+                $result[$i] = func_get_arg($i);
+            }
+        }
+        return $result;
+    }
+
 ?>
