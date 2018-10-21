@@ -1,20 +1,24 @@
 <?php
-    $query = "INSERT INTO event (latitude, longitude, image, type, name, phoneNo, reportDateTime, eventDateTime, status, important, urgent) VALUES (:latitude, :longitude, :image, :type, :name, :phoneNo, reportDateTime, :eventDateTime, :status, :important, :urgent)";
-    $params = [2.2, 2.2, NULL, "1", "John", "9999999", "2018", "2018", "open", 0, 0];
-    require_once('connectDB.php');
-    executeQuery($conn, $query, $params);
+    // $query = "INSERT INTO event (latitude, longitude, image, type, name, phoneNo, reportDateTime, eventDateTime, status, important, urgent) VALUES (:latitude, :longitude, :image, :type, :name, :phoneNo, reportDateTime, :eventDateTime, :status, :important, :urgent)";
+    // $params = [2.2, 2.2, NULL, "1", "John", "9999999", "2018", "2018", "open", 0, 0];
+    // require_once('connectDB.php');
+    // executeQuery($conn, $query, $params);
     if ($_SERVER['REQUEST_METHOD'] == 'POST')
     {
-        $latitude = test-input($_POST['latitude']);
-        $longitude = test-input($_POST['longitude']);
-        $image = test-input($_POST['image']);
-        $type = test-input($_POST['type']);
-        $name = test-input($_POST['name']);
-        $phoneNo = test-input($_POST['phoneNo']);
-        $eventDateTime = test-input($_POST['eventDateTime']);
-        $status = test-input($_POST['status']);
-        $important = test-input($_POST['important']);
-        $urgent = test-input($_POST['urgent']);
+        echo "posting";
+        $latitude = test_input($_POST['latitude']);
+        echo $_POST['latitude'];
+        echo $_POST;
+        $longitude = test_input($_POST['longitude']);
+        $image = test_input($_POST['image']);
+        $type = test_input($_POST['type']);
+        $name = test_input($_POST['name']);
+        $phoneNo = test_input($_POST['phoneNo']);
+        $eventDateTime = test_input($_POST['eventDateTime']);
+        $status = test_input($_POST['status']);
+        $important = test_input($_POST['important']);
+        $urgent = test_input($_POST['urgent']);
+        echo $urgent;
         require_once('connectDB.php');
 
         $reportDateTime = $_POST['reportDateTime'];
@@ -24,6 +28,14 @@
         executeQuery($conn, $query, $params);
         $conn->close();
     }
+
+    if ($_SERVER['REQUEST_METHOD'] == 'GET') 
+    {
+        echo "get";
+        $foo = $_PUT['foo'];
+        $latitude = test_input($_GET['latitude']);
+    }
+
     function test_input($data)
     {
     	$data = trim($data);
@@ -31,6 +43,7 @@
     	$data = htmlspecialchars($data);
     	return $data;
     }
+    
     function executeQuery($conn, $query, $params)
     {
         try
@@ -42,7 +55,7 @@
             $counter = 0;
             foreach ($matches as $array)
             {
-                echo substr($array[0], 0, strlen($array[0]) - 1)."<br>";
+                //echo substr($array[0], 0, strlen($array[0]) - 1)."<br>";
                 $stmt->bindParam(substr($array[0], 0, strlen($array[0]) - 1), $params[$counter]);
                 $counter++;
             }
