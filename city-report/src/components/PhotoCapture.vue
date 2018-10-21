@@ -10,11 +10,12 @@
 export default {
   name: "PhotoCapture",
 
+  props: ['setImage'],
+
   data() {
     return {
       cameraList: [],
-      selectedCameraIdx: 0,
-      image: null
+      selectedCameraIdx: 0
     };
   },
 
@@ -34,6 +35,12 @@ export default {
   },
 
   methods: {
+    _modalPosition() {
+      return {
+        type: 'viewport'
+      }
+    },
+
     gotDevices(infos) {
       infos.forEach(info => {
         if (info.kind === "videoinput") {
@@ -72,10 +79,11 @@ export default {
     getImage() {
       let canvas = document.createElement('canvas')
       let context = canvas.getContext('2d')
-      canvas.width = this.videoElement.clientWidth
-      canvas.height = this.videoElement.clientHeight
+      canvas.width = this.videoElement.clientWidth / 2
+      canvas.height = this.videoElement.clientHeight / 2
       context.drawImage(this.videoElement, 0, 0, canvas.width, canvas.height)
-      this.image = canvas.toDataURL()
+      this.setImage(canvas.toDataURL())
+      this.$modal.close()
     }
   }
 };
