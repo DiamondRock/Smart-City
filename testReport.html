@@ -1,0 +1,28 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(() => 
+{
+	loadData();
+});
+
+function loadData() 
+{
+	let date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+	$.ajax({
+		 type: "POST", 
+		 url: "report.php",
+		 data: {"latitude": 2.2, "longitude": 2.3, "type": "type2", "reportDateTime": date, "eventDateTime": "0000-00-00 00:00:01", "important": 0, "urgent": 0},
+		 success: (data) =>  {
+				alert(data);
+		 },
+		 error: () => { alert("error loading file");  }
+     });
+}
+</script>
+</head>
+<body>
+</body>
+
+	

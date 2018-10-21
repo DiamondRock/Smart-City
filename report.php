@@ -32,6 +32,7 @@
             {
                 //throw new Exception("Either description or image should be present");
             }
+
             $reportDateTime = date("c");
             $status = "pending";
 
@@ -64,7 +65,6 @@
         $param = htmlspecialchars($param);
     	return $param;
     }
-
     function checkIfDataIsValid()
     {
         $valid = AnyPostParamIsNull();
